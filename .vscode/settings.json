@@ -1,3 +1,19 @@
 {
-    "python.analysis.typeCheckingMode": "off"
+    "python.analysis.typeCheckingMode": "off",
+
+    "java.configuration.runtimes": [
+        {
+        "name": "JavaSE-1.8",
+        "path": "C:\\Users\\viraj\\Downloads\\java-1.8.0-openjdk-1.8.0.352-2.b08.redhat.windows.x86_64",
+        },
+        {
+        "name": "JavaSE-11",
+        "path": "/path/to/jdk-11",
+        },
+        {
+        "name": "JavaSE-17",
+        "path": "/path/to/jdk-17",
+        "default": true
+        },
+    ]
 }
