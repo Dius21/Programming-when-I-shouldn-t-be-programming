@@ -49,6 +49,6 @@ with open("listofsongs.txt", 'r') as f:
     listofsongs = [line.rstrip('\n') for line in f]
 
 x.call('cls',shell=True)
-print("Text File Created")
+print("Text File Created with "+str(c)+" songs")
 
 # AppOpener.open("Power automate")
