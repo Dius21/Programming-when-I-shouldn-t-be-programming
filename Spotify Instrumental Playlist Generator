@@ -1,5 +1,6 @@
 import spotipy
 from spotipy.oauth2 import SpotifyClientCredentials  
+import re
 
 #Authentication - without user
 client_credentials_manager = SpotifyClientCredentials(client_id="1ba6f73518864f2e93e6fc5a643d475a", client_secret="248e285fcfdf4537a73f7bd4b1f717a3")
@@ -8,13 +9,15 @@ sp = spotipy.Spotify(client_credentials_manager = client_credentials_manager)
 #getting the tracks
 linktoplaylist=input("enter link to playlist:")
 playlist_URI = linktoplaylist.split("/")[-1].split("?")[0]
+# playlist_URI = "https://open.spotify.com/playlist/37i9dQZF1DXcBWIGoYBM5M"
 trackURIs = [x["track"]["uri"] for x in sp.playlist_tracks(playlist_URI)["items"]]
 track_name = [x["track"]["name"] for x in sp.playlist_tracks(playlist_URI)["items"]]
 open("listofsongs", mode="w+")
-# print(trackURIs)
-# print(track_name)
 
-result = sp.search(q=track_name[1], type="track")
-tracks = result["tracks"]["items"]
-for track in tracks:
-    print("Song:", track["name"], "by", track["artists"][0]["name"])
+for i in range(len(track_name)):
+    results = sp.search(q=f'track:{track_name[i]} instrumental', type='track')
+    tracks = results['tracks']['items']
+    if tracks != []:
+        track_uri_indices=re.search(r"spotify:track:(.*)",tracks[0]['uri'])
+        found_track_uri=track_uri_indices.group(1)
+        print("open.spotify.com/track/"+found_track_uri)
