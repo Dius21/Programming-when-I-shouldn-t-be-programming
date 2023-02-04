@@ -1,4 +1,5 @@
 import spotipy
+import spotipy.util as sp_util
 from spotipy.oauth2 import SpotifyClientCredentials  
 import re
 import csv
@@ -6,16 +7,17 @@ import AppOpener
 import subprocess as x
 
 #Authentication - without user
+scope1="playlist-modify-public"
+scope2="playlist-modify-private"
 client_credentials_manager = SpotifyClientCredentials(client_id="1ba6f73518864f2e93e6fc5a643d475a", client_secret="248e285fcfdf4537a73f7bd4b1f717a3")
 sp = spotipy.Spotify(client_credentials_manager = client_credentials_manager)
 
 #getting the tracks
 linktoplaylist=input("enter link to playlist:")
 playlist_URI = linktoplaylist.split("/")[-1].split("?")[0]
-# playlist_URI = "https://open.spotify.com/playlist/37i9dQZF1DXcBWIGoYBM5M"
 trackURIs = [x["track"]["uri"] for x in sp.playlist_tracks(playlist_URI)["items"]]
 track_name = [x["track"]["name"] for x in sp.playlist_tracks(playlist_URI)["items"]]
-open("listofsongs", mode="w+")
+
 listofsongs=[]
 c=0
 for i in range(len(track_name)):
@@ -50,5 +52,3 @@ with open("listofsongs.txt", 'r') as f:
 
 x.call('cls',shell=True)
 print("Text File Created with "+str(c)+" songs")
-
-# AppOpener.open("Power automate")
