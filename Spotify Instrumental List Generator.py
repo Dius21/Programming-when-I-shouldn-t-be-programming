@@ -58,7 +58,8 @@ if len(list_of_instrumentals_URLs) > 100:
         i+=1
 
 #create playlist
-sp.user_playlist_create(user="z4a56x4jekfi6prgnsi3nsbpq", name=f"Instrumental - {str(sp.playlist(playlist_id=playlist_uri, fields='name')['name'])}", public=False, collaborative=False, description='Hey! This playlist was auto-generated using Python and Spotipy library.')
+userid=sp.current_user()['id']
+sp.user_playlist_create(user=userid, name=f"Instrumental - {str(sp.playlist(playlist_id=playlist_uri, fields='name')['name'])}", public=False, collaborative=False, description='Hey! This playlist was auto-generated using Python and Spotipy library.')
 playlists = sp.current_user_playlists(limit=5, offset=0)
 playlist_id = playlists['items'][00]['id']
 if i == 0:
