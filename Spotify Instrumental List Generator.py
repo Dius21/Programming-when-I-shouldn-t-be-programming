@@ -2,6 +2,7 @@ import spotipy
 from spotipy.oauth2 import SpotifyOAuth  
 import re
 import subprocess as x
+import time
 
 #authentication -- User OAuth2
 scope = "playlist-read-private playlist-read-collaborative playlist-modify-private playlist-modify-public user-library-modify user-library-read"
@@ -70,4 +71,6 @@ else:
         sp.playlist_add_items(playlist_id=playlist_id, items=dict_of_instrumental_URLs_split[c-i], position=None)
         i-=1
 
-print("Playlist Created")
+print("Playlist Created (Check your library)")
+print("This window will close in 5 seconds.")
+time.sleep(5)
