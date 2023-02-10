@@ -1,92 +1,72 @@
 import spotipy
-import spotipy.util as sp_util
-from spotipy.oauth2 import SpotifyClientCredentials  
+from spotipy.oauth2 import SpotifyOAuth  
 import re
 import subprocess as x
-import sys
-
-print("Under contruction!!! DO NOT RUN")
-sys.exit()
-
-
-
-# #Authentication - without user
-client_credentials_manager = SpotifyClientCredentials(client_id="1ba6f73518864f2e93e6fc5a643d475a", client_secret="248e285fcfdf4537a73f7bd4b1f717a3")
-sp = spotipy.Spotify(client_credentials_manager = client_credentials_manager)
-
-# #getting the tracks
-linktoplaylist=input("enter link to playlist:")
-playlist_URI = linktoplaylist.split("/")[-1].split("?")[0]
-trackURIs = [x["track"]["uri"] for x in sp.playlist_tracks(playlist_URI)["items"]]
-track_name = [x["track"]["name"] for x in sp.playlist_tracks(playlist_URI)["items"]]
-
-#get list of instrumentals
-listofsongs=[]
-c=0
-for i in range(len(track_name)):
-    results = sp.search(q=f'track:{track_name[i]} instrumental', type='track')
-    tracks = results['tracks']['items']
-    if tracks != []:
-        track_uri_indices=re.search(r"spotify:track:(.*)",tracks[0]['uri'])
-        found_track_uri=track_uri_indices.group(1)
-        listofsongs.append("https://open.spotify.com/track/"+found_track_uri)
-        x.call('cls',shell=True)
-        c+=1
-        if c==0:
-            print("Searching -")
-        if (c%4)==1:
-            print("Searching \\")
-        if (c%4)==2:
-            print("Searching |")
-        if (c%4)==3:
-            print("Searching /")
-        if (c%4)==0:
-            print("Searching -")
-
-x.call('cls',shell=True)
-print("Done")
-
-#save list of intrumentals
-with open("listofsongs.txt", 'w') as f:
-    for s in listofsongs:
-        f.write(str(s) + '\n')
-
-with open("listofsongs.txt", 'r') as f:
-    listofsongs = [line.rstrip('\n') for line in f]
-
-x.call('cls',shell=True)
-print("Text File Created with "+str(c)+" songs")
-
 
 #authentication -- User OAuth2
-scope1 = 'user-library-read'
-scope2="playlist-modify-public"
-scope3="playlist-modify-private"
+scope = "playlist-read-private playlist-read-collaborative playlist-modify-private playlist-modify-public user-library-modify user-library-read"
+sp = spotipy.Spotify(auth_manager=SpotifyOAuth(client_id="1ba6f73518864f2e93e6fc5a643d475a", client_secret="248e285fcfdf4537a73f7bd4b1f717a3", scope=scope, redirect_uri="http://localhost:8080"))
 
-if len(sys.argv) > 1:
-    username = sys.argv[1]
+#getting the tracks
+playlist_uri = input("Enter link to playlist:").split("/")[-1].split("?")[0]
+x.call('cls',shell=True)
+print("Getting Tracks from Playlist")
+all_tracks= sp.playlist_tracks(playlist_uri)
+playlist_tracks_temp = all_tracks["items"]
+while all_tracks['next']:
+        all_tracks = sp.next(all_tracks)
+        playlist_tracks_temp.extend(all_tracks['items'])
+all_track_names = [x["track"]["name"] for x in playlist_tracks_temp]
+
+
+#get list of instrumentals
+list_of_instrumentals_URLs=[]
+c=0
+c_found=0
+c_not_found=0
+for i in range(len(all_track_names)):
+    _= sp.search(q=f'track:{all_track_names[i]} instrumental', type='track')
+    search_result = _['tracks']['items']
+    if search_result != []:
+        if search_result != None:
+            c_found+=1
+            list_of_instrumentals_URLs.append("https://open.spotify.com/track/"+re.search(r"spotify:track:(.*)",search_result[0]['uri']).group(1))
+        else:
+            c_not_found+=1
+    else:
+        c_not_found+=1
+    x.call('cls',shell=True)
+    c+=1
+    if (c%4)==1:
+        print(f"Searching \\\nNumber of instrumentals found: {c_found}\nNumber of instrumentals not found: {c_not_found}")
+    elif (c%4)==2:
+        print(f"Searching |\nNumber of instrumentals found: {c_found}\nNumber of instrumentals not found: {c_not_found}")
+    elif (c%4)==3:
+        print(f"Searching /\nNumber of instrumentals found: {c_found}\nNumber of instrumentals not found: {c_not_found}")
+    elif (c%4)==0:
+        print(f"Searching -\nNumber of instrumentals found: {c_found}\nNumber of instrumentals not found: {c_not_found}")
+x.call('cls',shell=True)
+print(f"Number of instrumentals found: {c_found}\nNumber of instrumentals not found: {c_not_found}\nTotal searched = {c_found+c_not_found}")
+
+#splitting large lists
+i=0
+dict_of_instrumental_URLs_split = {}
+if len(list_of_instrumentals_URLs) > 100:
+    while len(list_of_instrumentals_URLs) > 0:
+        dict_of_instrumental_URLs_split[i] = list_of_instrumentals_URLs[0:100]
+        del list_of_instrumentals_URLs[0:100]
+        i+=1
+
+#create playlist
+sp.user_playlist_create(user="z4a56x4jekfi6prgnsi3nsbpq", name=f"Instrumental - {str(sp.playlist(playlist_id=playlist_uri, fields='name')['name'])}", public=False, collaborative=False, description='Hey! This playlist was auto-generated using Python and Spotipy library.')
+playlists = sp.current_user_playlists(limit=5, offset=0)
+playlist_id = playlists['items'][00]['id']
+if i == 0:
+    sp.playlist_add_items(playlist_id=playlist_id, items=list_of_instrumentals_URLs, position=None)
 else:
-    print("Usage: %s username" % (sys.argv[0],))
-    sys.exit()
+    c=i
+    while i>0:
+        sp.playlist_add_items(playlist_id=playlist_id, items=dict_of_instrumental_URLs_split[c-i], position=None)
+        i-=1
 
-token = sp_util.prompt_for_user_token(username, scope1, client_id='1ba6f73518864f2e93e6fc5a643d475a', client_secret='248e285fcfdf4537a73f7bd4b1f717a3', redirect_uri='http://localhost/')
-
-#create playlist for user
-with open("reference.txt", 'r') as r:
-    reference=int(r.read())
-reference+=1
-with open("reference.txt", 'w') as r:
-    r.write(str(reference))
-sp.user_playlist_create(username, "Instrumental playlist created via spotipy api"+str(reference), public=True, collaborative=False, description='')
-
-
-
-#Print saved songs
-# if token:
-#     sp = spotipy.Spotify(auth=token)
-#     results = sp.current_user_saved_tracks()
-#     for item in results['items']:
-#         track = item['track']
-#         print(track['name'] + ' - ' + track['artists'][0]['name'])
-# else:
-#     print("Can't get token for", username)
+print("Playlist Created")
