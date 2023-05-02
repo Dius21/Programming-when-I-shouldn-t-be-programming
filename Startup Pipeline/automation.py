@@ -1,5 +1,9 @@
-import importlib
-calculator_gui_importable=  importlib.import_module('C:\Users\\viraj\Programming when I shouldn\'t be Programming\calculator_gui_importable.py')
+import importlib.util
+
+spec = importlib.util.spec_from_file_location(r"calculator_gui_importable", "../Tkinter_calculator")   
+foo = importlib.util.module_from_spec(spec)       
+spec.loader.exec_module(foo)
+foo.GUI()
+
 import HMMM
- 
-calculator_gui_importable.GUI()
+
