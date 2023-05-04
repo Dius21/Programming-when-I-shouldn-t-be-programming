@@ -1,32 +1,23 @@
 import tkinter as tk
 
-storeno1 = 0.0
-storeno2 = 0.0
-operator = ""
-decimal_flag=0
-decimal_count=0
-current_fontsize=80
-
 def changestate(Current_Charachter):
     global operator
     global decimal_flag
     global decimal_count
     global current_fontsize
 
-    if Current_Charachter == "." and decimal_flag==1:
-        pass
-    elif Current_Charachter=="." and decimal_flag==0:
+    if Current_Charachter == ".":
         decimal_flag=1
+        return()
     elif Current_Charachter in ["+","-","*","/"]:
+        GUI.label.config(text=str(storeno1)+operator)
         operator=Current_Charachter
         decimal_count=0
         decimal_flag=0
-        GUI.label.config(text=str(storeno1)+operator)
-    elif  Current_Charachter == "=" and operator!="":
+        return()
+    elif  Current_Charachter == "=":
         _=calculate(storeno1,operator,storeno2)
         GUI.label.config(text=_,font=('Helvetica bold', (90-(10*len(str(_)))) if (90-(10*len(str(_))))>10 else 10))
-    elif Current_Charachter=="=" and operator=="":
-        pass
     elif int(Current_Charachter) in range(0,10) and operator not in ["+","-","*","/"]:
         GUI.label.config(text=changestoreno1(int(Current_Charachter)))
     elif int(Current_Charachter) in range(0,10) and operator in ["+","-","*","/"]:
@@ -60,23 +51,24 @@ def changestoreno2(_,*args):
         storeno2=storeno2+(_/(10**decimal_count))
         return storeno2
 
-
 def calculate(no1,operator,no2):
-    match operator:
-        case "+":
-            return (no1+no2)
-        case "-":
-            return (no1-no2)
-        case "*":
-            return (no1*no2)
-        case "/":
-            return (no1/no2)
-        case "%":
-            return (no1%no2)
-        case default:
-            return None
-
-
+    if storeno2 != 0:
+        match operator:
+            case "+":
+                return (no1+no2)
+            case "-":
+                return (no1-no2)
+            case "*":
+                return (no1*no2)
+            case "/":
+                return (no1/no2)
+            case "%":
+                return (no1%no2)
+    else:
+        temp=no1
+        reset()
+        no1=temp
+        return (no1)
 
 def reset():
     global storeno1
@@ -100,9 +92,10 @@ def GUI():
     frame_display = tk.Frame(master=window, height=100, width=250)
     frame_display.pack()
     frame_display.pack_propagate(0)
+    current_fontsize=80
     GUI.label = tk.Label(master=frame_display, text=0, font=('Helvetica bold', current_fontsize))
     GUI.label.pack()
-    
+    reset()
 
     frame_pad=tk.Frame(master=window, height=300, width=250)
     frame_pad.pack()
@@ -143,7 +136,6 @@ def GUI():
     button_division.grid(column=4,row=4)
     button_clear=tk.Button(master= window, text=" clear ", font=('Helvetica bold', 35), command=reset)
     button_clear.pack()
-
 
     window.mainloop()
 
