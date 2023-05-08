@@ -1,9 +1,12 @@
 import importlib.util
+import HMMM
 
-spec = importlib.util.spec_from_file_location(r"calculator_gui_importable", "../Tkinter_calculator")   
+HMMM
+
+spec = importlib.util.spec_from_file_location("calculator_gui_importable", "C:/Users/viraj/Programming when I shouldn't be Programming/Tkinter_calculator/calculator_gui_importable.py") 
 foo = importlib.util.module_from_spec(spec)       
 spec.loader.exec_module(foo)
 foo.GUI()
 
-import HMMM
+
 
