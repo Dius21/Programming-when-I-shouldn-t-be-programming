@@ -10,8 +10,8 @@ def changestate(Current_Charachter):
         decimal_flag=1
         return()
     elif Current_Charachter in ["+","-","*","/"]:
-        GUI.label.config(text=str(storeno1)+operator)
         operator=Current_Charachter
+        GUI.label.config(text=str(storeno1)+operator)
         decimal_count=0
         decimal_flag=0
         return()
@@ -22,6 +22,7 @@ def changestate(Current_Charachter):
         GUI.label.config(text=changestoreno1(int(Current_Charachter)))
     elif int(Current_Charachter) in range(0,10) and operator in ["+","-","*","/"]:
         GUI.label.config(text=changestoreno2(int(Current_Charachter)))
+
     if operator=="" and len(str(storeno1))>3 and current_fontsize>=10:
         current_fontsize-=10
         GUI.label.config(font=('Helvetica bold', current_fontsize))
